@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galaxia de Flores Amarillas 🌻</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    #main-title {
+      position: fixed;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      color: #ffee58;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 0 0 18px #fbc02d, 0 0 8px #fbc02d;
+      z-index: 10;
+      pointer-events: none;
+    }
+    #start-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      z-index: 20;
+      cursor: pointer;
+    }
+    .flower-icon { font-size: 60px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <div id="main-title" style="display:none;">
+    Feliz día de las Flores Amarillas 🌻
+  </div>
+
+  <div id="start-overlay" onclick="startExperience()">
+    <div class="flower-icon">🌻</div>
+    <h1>Toca para iniciar</h1>
+  </div>
+
+  <audio id="bg-music" loop src="flores.mp3"></audio>
+
+  <script>
+    let scene, camera, renderer, controls;
+    let mainGroup = new THREE.Group();
+
+    const frases = [
+      "Feliz día de las Flores Amarillas 🌻",
+      "Que el amarillo llene tu día de luz 💛",
+      "Pétalos dorados llenos de alegría",
+      "Flores que brillan como el sol",
+      "Un detalle amarillo para ti",
+      "El color más brillante para el día",
+      "Girasoles que siguen tu luz 🌻",
+      "Un mar de flores amarillas",
+      "Flores que traen buena energía",
+      "Un destello dorado en el camino",
+      "Sembrando sonrisas con girasoles",
+      "Un ramo de luz para tu día",
+      "Que florezca siempre lo bonito 💛",
+      "Colores cálidos para un gran día",
+      "Girasoles llenos de vida 🌻",
+      "Pétalos de sol y primavera",
+      "Flores para alegrar el momento",
+      "Un regalo lleno de color amarillo",
+      "El brillo de la primavera en una flor",
+      "Flores amarillas para iluminar todo",
+      "Que la calidez de estas flores te acompañe 🌻",
+      "Pétalos de alegría y luz",
+      "Un toque dorado para tu día",
+      "Florecer con toda la energía 💛",
+      "Girasoles brillantes solo para ti",
+
+      "Arredondo, eres luz en mis días ✨",
+      "Atesoro mucho tu compañía, Arredondo",
+      "Arredondo, contigo el mundo es más bonito 💛",
+      "Gracias por estar, Arredondo",
+      "Arredondo, tu sonrisa ilumina todo",
+      "Eres una persona muy especial, Arredondo",
+      "Arredondo, alegras cada momento",
+      "Siempre es un gusto coincidir contigo, Arredondo",
+      "Arredondo, brillas con luz propia ✨",
+      "Valoro mucho nuestra amistad, Arredondo 💛",
+      "Arredondo, haces los días más agradables",
+      "Que nunca te falte alegría, Arredondo",
+      "Arredondo, gracias por tu vibra tan bonita",
+      "Tu presencia siempre suma, Arredondo ✨",
+      "Arredondo, mereces todo lo bueno",
+      "Contigo las tardes son más ligeras, Arredondo",
+      "Arredondo, tu energía positiva es contagiosa 💛",
+      "Gracias por ser esa gran persona, Arredondo",
+      "Arredondo, un gran abrazo para ti",
+      "Eres único e inigualable, Arredondo ✨",
+      "Arredondo, gracias por compartir tu luz",
+      "Que tengas siempre motivos para sonreír, Arredondo 💛",
+      "Arredondo, un detalle para decirte cuánto te aprecio",
+      "Siempre es genial hablar contigo, Arredondo",
+      "Arredondo, hoy celebro tenerte cerca ✨"
+    ];
+
+    function initGalaxy() {
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 160);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      document.body.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.enableRotate = false;
+
+      controls.minDistance = 80;
+      controls.maxDistance = 200;
+
+      scene.add(mainGroup);
+
+      const blackHoleGeo = new THREE.CircleGeometry(14, 64);
+      const blackHoleMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+      const blackHole = new THREE.Mesh(blackHoleGeo, blackHoleMat);
+      blackHole.position.z = 1;
+      mainGroup.add(blackHole);
+
+      const ringGeo = new THREE.RingGeometry(15, 34, 64);
+      const ringMat = new THREE.MeshBasicMaterial({ 
+        color: 0xffeb3b, 
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.95,
+        blending: THREE.AdditiveBlending
+      });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI / 2.5;
+      mainGroup.add(ring);
+
+      const pCount = 3000;
+      const pGeo = new THREE.BufferGeometry();
+      const pPos = new Float32Array(pCount * 3);
+      for (let i = 0; i < pCount; i++) {
+        pPos[i * 3] = (Math.random() - 0.5) * 320;
+        pPos[i * 3 + 1] = (Math.random() - 0.5) * 220;
+        pPos[i * 3 + 2] = (Math.random() - 0.5) * 60;
+      }
+      pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+      const pMat = new THREE.PointsMaterial({ 
+        color: 0xfff176, 
+        size: 1.3, 
+        transparent: true, 
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending 
+      });
+      const particles = new THREE.Points(pGeo, pMat);
+      mainGroup.add(particles);
+
+      for (let i = 0; i < 20; i++) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        ctx.font = '180px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText("🌻", 128, 128);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+        const sprite = new THREE.Sprite(mat);
+
+        const angle = (i / 20) * Math.PI * 2;
+        const dist = 38 + Math.random() * 105;
+        sprite.position.set(Math.cos(angle) * dist, Math.sin(angle) * dist * 0.65, (Math.random() - 0.5) * 30);
+        sprite.scale.set(19, 19, 1);
+        mainGroup.add(sprite);
+      }
+
+      frases.forEach((text, i) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 160;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff9c4';
+        ctx.font = 'Bold 46px Arial';
+        ctx.shadowColor = '#fbc02d';
+        ctx.shadowBlur = 18;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 512, 80);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.needsUpdate = true;
+
+        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false });
+        const sprite = new THREE.Sprite(mat);
+
+        const angle = (i / frases.length) * Math.PI * 2;
+        const dist = 42 + Math.random() * 110;
+        sprite.position.set(Math.cos(angle) * dist, Math.sin(angle) * dist * 0.68, (Math.random() - 0.5) * 40);
+        sprite.scale.set(46, 7.2, 1);
+        mainGroup.add(sprite);
+      });
+
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (mainGroup) {
+        mainGroup.rotation.z += 0.0012;
+      }
+
+      if (controls) controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function startExperience() {
+      document.getElementById('start-overlay').style.display = 'none';
+      document.getElementById('main-title').style.display = 'block';
+
+      const music = document.getElementById('bg-music');
+      if (music) {
+        music.play().catch(e => console.log("Audio:", e));
+      }
+
+      initGalaxy();
+    }
+
+    window.addEventListener('resize', () => {
+      if (camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+    });
+  </script>
+</body>
+</html>
